@@ -25,7 +25,10 @@ class ExcelController extends Controller
         try{
 
             $files = [];
-            $dir = '../../wp-content/uploads/2019/08/';
+            //PRO
+            //$dir = '../../wp-content/uploads/2019/08/';
+            //TEST
+            $dir = '../../wordpress/wp-content/uploads/2019/08/';
             foreach (glob($dir."*.xlsx") as $file){ 
                 $files[] = $file; 
             } 
@@ -93,7 +96,12 @@ class ExcelController extends Controller
                     } else {
                         \DB::table('logger')->insert(['description' => 'El archivo '.$vf.' no tiene el formato esperado. Archivo no procesado.', 'created_at' => date('Y-m-d H:i:s')]);
                     }
+
+                    $sin_dir = explode("/", $vf);
+                    $file_name = explode(".", $sin_dir[count($sin_dir)-1]);
+
                     unlink($vf);
+                    \DB::table('wp_posts')->where('post_type', 'attachment')->where('post_title', $file_name[0])->delete();
                 } else {
                     \DB::table('logger')->insert(['description' => 'El archivo '.$vf.' no existe.', 'created_at' => date('Y-m-d H:i:s')]);
                 }
